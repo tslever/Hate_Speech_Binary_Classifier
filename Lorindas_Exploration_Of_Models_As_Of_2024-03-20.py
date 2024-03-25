@@ -126,7 +126,7 @@ training_arguments = TrainingArguments(
     push_to_hub = False,
     #resume_from_checkpoint
     #hub_model_id
-    hub_strategy = "every_save"
+    hub_strategy = "every_save",
     #hub_token
     hub_private_repo = False,
     hub_always_push = False,
