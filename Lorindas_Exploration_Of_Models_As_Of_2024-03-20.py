@@ -65,4 +65,4 @@ training_arguments = TrainingArguments(
     load_best_model_at_end=False,  # Avoids loading the best model at the end, which can save disk space
 )
 
-trainer.train()
+Trainer.train()
