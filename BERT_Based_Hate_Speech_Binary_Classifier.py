@@ -39,6 +39,7 @@ def compute_metrics(eval_pred):
 from transformers import AutoModelForSequenceClassification
 model = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
 from transformers import TrainingArguments
+# For descriptions of all parameters to constructor TrainingArguments, see https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py .
 training_arguments = TrainingArguments(
     output_dir = "./training_output",
     overwrite_output_dir = True,
