@@ -6,11 +6,11 @@ name = "pypi"
 [packages]
 pandas = "*"
 scikit-learn = "*"
-transformers = "*"
 datasets = "*"
 torch = "*"
 torchvision = "*"
 torchaudio = "*"
+transformers = {extras = ["torch"], version = "*"}
 
 [dev-packages]
 
