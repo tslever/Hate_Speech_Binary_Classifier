@@ -4,9 +4,15 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-praw = "*"
+pandas = "*"
+scikit-learn = "*"
+transformers = "*"
+datasets = "*"
+torch = "*"
+torchvision = "*"
+torchaudio = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.12"
+python_version = "3.11"
