@@ -47,6 +47,7 @@ from transformers import AutoModelForSequenceClassification, Trainer, TrainingAr
 
 model = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2) # Adjust `num_labels` as necessary
 
+'''
 training_args = TrainingArguments(
     output_dir='./results',
     num_train_epochs=3,
@@ -55,6 +56,7 @@ training_args = TrainingArguments(
     logging_dir='./logs',
     evaluation_strategy='epoch',
 )
+'''
 
 training_arguments = TrainingArguments(
     output_dir="./training_output",
@@ -65,4 +67,12 @@ training_arguments = TrainingArguments(
     load_best_model_at_end=False,  # Avoids loading the best model at the end, which can save disk space
 )
 
-Trainer.train()
+trainer = Trainer(
+    model = model,
+    args = training_arguments,
+    train_dataset = dataset_dict['train'],
+    eval_dataset = dataset_dict['validation'],
+    compute_metrics = compute_metrics
+)
+
+trainer.train()
