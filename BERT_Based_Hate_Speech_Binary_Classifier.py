@@ -1,15 +1,16 @@
 # Load And Preprocess Data
 import pandas as pd
-data_frame = pd.read_csv('HateSpeechDataset.csv', dtype = {'Content': str, 'Label': int})
-data_frame = data_frame[['Content', 'Label']].rename(columns = {'Label': 'labels'})
-print(f'Shape Of Hate Speech Data Set: {data_frame.shape}')
-print(f'Head Of Hate Speech Data Set:\n{data_frame.head(3)}')
+data_frame = pd.read_csv('HateSpeechDataset.csv', dtype = str)
+data_frame = data_frame[['Content', 'Label']]
+data_frame = data_frame[data_frame['Label'].apply(lambda x: x.isnumeric())]
+data_frame['Label'] = data_frame['Label'].astype(int)
+data_frame = data_frame.rename(columns = {'Label': 'labels'})
 
 
 # Tokenize And Prepare Data
 # Instantiate one of the tokenizer classes of the library from a pretrained model vocabulary.
 from transformers import AutoTokenizer
-tokenizer = AutoTokenizer.from_pretrained('bert-large-uncased')
+tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
 
 def tokenize(data_set):
     return tokenizer(data_set['Content'], padding = "max_length", truncation = True)
@@ -78,7 +79,7 @@ def compute_metrics(evalPrediction):
     global global_step
     global_step += 500
     data_frame_of_performance_metrics.to_csv(
-        path_or_buf = f"./training_output_2/Data_Frame_Of_Performance_Metrics_After_{str(global_step).zfill(7)}_Steps.csv",
+        path_or_buf = f"./training_output/Data_Frame_Of_Performance_Metrics_After_{str(global_step).zfill(7)}_Steps.csv",
         index = False
     )
     return {
@@ -91,7 +92,7 @@ def compute_metrics(evalPrediction):
     }
 
 from transformers import AutoModelForSequenceClassification
-model = AutoModelForSequenceClassification.from_pretrained("bert-large-uncased", num_labels = 2)
+model = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased", num_labels = 2)
 
 from transformers import TrainingArguments
 # For descriptions of all parameters to constructor TrainingArguments, see https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py .
