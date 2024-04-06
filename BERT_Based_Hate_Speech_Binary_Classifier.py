@@ -70,12 +70,15 @@ def compute_metrics(evalPrediction):
             index_of_maximum_F1_measure = i
     data_frame_of_performance_metrics = pd.DataFrame({
         'threshold': numpy_array_of_thresholds,
+        'F1_measure': list_of_F1_measures,
         'accuracy': list_of_accuracies,
         'True Positive Rate / Recall': list_of_TPRs, 
         'False Positive Rate': list_of_FPRs,
-        'Positive Predictive Value / Precision': list_of_PPVs,
-        'F1_measure': list_of_F1_measures
-    })
+        'Positive Predictive Value / Precision': list_of_PPVs
+    }).sort_values(
+        by = ['F1_measure', 'accuracy', 'True Positive Rate / Recall', 'False Positive Rate', 'Positive Predictive Value / Precision'],
+        ascending = [False, False, False, False, False]
+    )
     global global_step
     global_step += 500
     data_frame_of_performance_metrics.to_csv(
