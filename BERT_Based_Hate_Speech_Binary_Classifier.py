@@ -1,32 +1,30 @@
 # Load And Preprocess Data
 import pandas as pd
-df = pd.read_csv('HateSpeechDataset.csv', dtype = str)
-print(f'Shape Of Hate Speech Data Set: {df.shape}')
-print(f'Head Of Hate Speech Data Set:\n{df.head(3)}')
-df = df[df['Label'].apply(lambda x: x.isnumeric())]
-df['Label'] = df['Label'].astype(int)
-df = df.drop('Content_int', axis=1)
-df = df.rename(columns={'Label':'labels'})
-df.reset_index(inplace=True, drop=False)
-df.rename(columns={'index': 'id'}, inplace=True)
-print(f'Shape Of Hate Speech Data Set: {df.shape}')
-print(f'Head Of Hate Speech Data Set:\n{df.head(3)}')
+data_frame = pd.read_csv('HateSpeechDataset.csv', dtype = {'Content': str, 'Label': int})
+data_frame = data_frame[['Content', 'Label']].rename(columns = {'Label': 'labels'})
+print(f'Shape Of Hate Speech Data Set: {data_frame.shape}')
+print(f'Head Of Hate Speech Data Set:\n{data_frame.head(3)}')
+
 
 # Tokenize And Prepare Data
-checkpoint = 'bert-base-uncased'
+# Instantiate one of the tokenizer classes of the library from a pretrained model vocabulary.
 from transformers import AutoTokenizer
-tokenizer = AutoTokenizer.from_pretrained(checkpoint)
-def tokenize_function(examples):
-    return tokenizer(examples['Content'], padding="max_length", truncation=True)
+tokenizer = AutoTokenizer.from_pretrained('bert-large-uncased')
+
+def tokenize(data_set):
+    return tokenizer(data_set['Content'], padding = "max_length", truncation = True)
+
 from datasets import Dataset
-dataset = Dataset.from_pandas(df)
-tokenized_dataset = dataset.map(tokenize_function, batched=True)
-train_test_split = tokenized_dataset.train_test_split(test_size=0.1)
+data_set = Dataset.from_pandas(data_frame)
+tokenized_dataset = data_set.map(tokenize, batched = True)
+dictionary_of_training_and_testing_data_sets = tokenized_dataset.train_test_split(test_size = 0.1)
+
 from datasets import DatasetDict
-dataset_dict = DatasetDict({
-    'train': train_test_split['train'],
-    'validation': train_test_split['test']
+dictionary_of_training_and_validation_data_sets = DatasetDict({
+    'training': dictionary_of_training_and_testing_data_sets['train'],
+    'validation': dictionary_of_training_and_testing_data_sets['test']
 })
+
 
 # Model Training Setup
 global_step = 0
@@ -41,9 +39,8 @@ def compute_metrics(evalPrediction):
     if not os.path.exists('./training_output'):
         os.makedirs('./training_output')
     numpy_array_of_logits, numpy_array_of_labels = evalPrediction # 1000 x 2, 1000 x 1
-    print(numpy_array_of_labels[0:3])
-    probs = softmax(numpy_array_of_logits, axis = 1)[:, 1]
-    numpy_array_of_thresholds = np.linspace(0, 1, 100)
+    numpy_array_of_probabilities = softmax(numpy_array_of_logits, axis = 1)[:, 1]
+    numpy_array_of_thresholds = np.linspace(0, 1, 101)
     list_of_accuracies = []
     list_of_TPRs = []
     list_of_FPRs = []
@@ -52,7 +49,7 @@ def compute_metrics(evalPrediction):
     maximum_F1_measure = -1.0
     index_of_maximum_F1_measure = -1
     for i in range(0, len(numpy_array_of_thresholds)):
-        numpy_array_of_predictions_at_threshold = (probs >= numpy_array_of_thresholds[i]).astype(int)
+        numpy_array_of_predictions_at_threshold = (numpy_array_of_probabilities >= numpy_array_of_thresholds[i]).astype(int)
         accuracy = (numpy_array_of_predictions_at_threshold == numpy_array_of_labels).sum() / len(numpy_array_of_labels)
         FN = ((numpy_array_of_predictions_at_threshold == 0) & (numpy_array_of_labels == 1)).sum()
         FP = ((numpy_array_of_predictions_at_threshold == 1) & (numpy_array_of_labels == 0)).sum()
@@ -81,7 +78,7 @@ def compute_metrics(evalPrediction):
     global global_step
     global_step += 500
     data_frame_of_performance_metrics.to_csv(
-        path_or_buf = f"./training_output/Data_Frame_Of_Performance_Metrics_After_{global_step}_Steps.csv",
+        path_or_buf = f"./training_output_2/Data_Frame_Of_Performance_Metrics_After_{str(global_step).zfill(7)}_Steps.csv",
         index = False
     )
     return {
@@ -94,7 +91,8 @@ def compute_metrics(evalPrediction):
     }
 
 from transformers import AutoModelForSequenceClassification
-model = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
+model = AutoModelForSequenceClassification.from_pretrained("bert-large-uncased", num_labels = 2)
+
 from transformers import TrainingArguments
 # For descriptions of all parameters to constructor TrainingArguments, see https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py .
 training_arguments = TrainingArguments(
@@ -209,12 +207,13 @@ training_arguments = TrainingArguments(
 
 from transformers import Trainer
 trainer = Trainer(
-    model=model,
-    args=training_arguments,
-    train_dataset=dataset_dict['train'],
-    eval_dataset=dataset_dict['validation'],
-    compute_metrics=compute_metrics
+    model = model,
+    args = training_arguments,
+    train_dataset = dictionary_of_training_and_validation_data_sets['training'],
+    eval_dataset = dictionary_of_training_and_validation_data_sets['validation'],
+    compute_metrics = compute_metrics
 )
+
 
 # Train
 trainer.train()
