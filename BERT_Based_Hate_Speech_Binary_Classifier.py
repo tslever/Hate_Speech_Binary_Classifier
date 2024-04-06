@@ -1,6 +1,6 @@
 # Load And Preprocess Data
 import pandas as pd
-df = pd.read_csv('HateSpeechDataset.csv')
+df = pd.read_csv('HateSpeechDataset.csv', dtype = str)
 print(f'Shape Of Hate Speech Data Set: {df.shape}')
 print(f'Head Of Hate Speech Data Set:\n{df.head(3)}')
 df = df[df['Label'].apply(lambda x: x.isnumeric())]
@@ -29,12 +29,69 @@ dataset_dict = DatasetDict({
 })
 
 # Model Training Setup
+global_step = 0
+
 import numpy as np
-from sklearn.metrics import accuracy_score
-def compute_metrics(eval_pred):
-    logits, labels = eval_pred
-    predictions = np.argmax(logits, axis=-1)
-    return {'accuracy': accuracy_score(labels, predictions)}
+def softmax(x, axis = None):
+    e_x = np.exp(x - np.max(x, axis = axis, keepdims = True))
+    return e_x / e_x.sum(axis = axis, keepdims = True)
+
+import os
+def compute_metrics(evalPrediction):
+    if not os.path.exists('./training_output'):
+        os.makedirs('./training_output')
+    numpy_array_of_logits, numpy_array_of_labels = evalPrediction # 1000 x 2, 1000 x 1
+    print(numpy_array_of_labels[0:3])
+    probs = softmax(numpy_array_of_logits, axis = 1)[:, 1]
+    numpy_array_of_thresholds = np.linspace(0, 1, 100)
+    list_of_accuracies = []
+    list_of_TPRs = []
+    list_of_FPRs = []
+    list_of_PPVs = []
+    list_of_F1_measures = []
+    maximum_F1_measure = -1.0
+    index_of_maximum_F1_measure = -1
+    for i in range(0, len(numpy_array_of_thresholds)):
+        numpy_array_of_predictions_at_threshold = (probs >= numpy_array_of_thresholds[i]).astype(int)
+        accuracy = (numpy_array_of_predictions_at_threshold == numpy_array_of_labels).sum() / len(numpy_array_of_labels)
+        FN = ((numpy_array_of_predictions_at_threshold == 0) & (numpy_array_of_labels == 1)).sum()
+        FP = ((numpy_array_of_predictions_at_threshold == 1) & (numpy_array_of_labels == 0)).sum()
+        TN = ((numpy_array_of_predictions_at_threshold == 0) & (numpy_array_of_labels == 0)).sum()
+        TP = ((numpy_array_of_predictions_at_threshold == 1) & (numpy_array_of_labels == 1)).sum()
+        TPR = TP / (TP + FN) if (TP + FN) > 0 else 0
+        FPR = FP / (FP + TN) if (FP + TN) > 0 else 0
+        PPV = TP / (TP + FP) if (TP + FP) > 0 else 0
+        F1_measure = 2 * (PPV * TPR) / (PPV + TPR) if (PPV + TPR) > 0 else 0
+        list_of_accuracies.append(accuracy)
+        list_of_TPRs.append(TPR)
+        list_of_FPRs.append(FPR)
+        list_of_PPVs.append(PPV)
+        list_of_F1_measures.append(F1_measure)
+        if F1_measure > maximum_F1_measure:
+            maximum_F1_measure = F1_measure
+            index_of_maximum_F1_measure = i
+    data_frame_of_performance_metrics = pd.DataFrame({
+        'threshold': numpy_array_of_thresholds,
+        'accuracy': list_of_accuracies,
+        'True Positive Rate / Recall': list_of_TPRs, 
+        'False Positive Rate': list_of_FPRs,
+        'Positive Predictive Value / Precision': list_of_PPVs,
+        'F1_measure': list_of_F1_measures
+    })
+    global global_step
+    global_step += 500
+    data_frame_of_performance_metrics.to_csv(
+        path_or_buf = f"./training_output/Data_Frame_Of_Performance_Metrics_After_{global_step}_Steps.csv",
+        index = False
+    )
+    return {
+        'maximum_F1_measure': maximum_F1_measure,
+        'corresponding_threshold': numpy_array_of_thresholds[index_of_maximum_F1_measure],
+        'corresponding_accuracy': list_of_accuracies[index_of_maximum_F1_measure],
+        'corresponding_TPR': list_of_TPRs[index_of_maximum_F1_measure],
+        'corresponding_FPR': list_of_FPRs[index_of_maximum_F1_measure],
+        'corresponding_PPV': list_of_PPVs[index_of_maximum_F1_measure]
+    }
 
 from transformers import AutoModelForSequenceClassification
 model = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
@@ -103,7 +160,7 @@ training_arguments = TrainingArguments(
     remove_unused_columns = True,
     #label_names
     load_best_model_at_end = True,
-    metric_for_best_model = "accuracy",
+    metric_for_best_model = "maximum_F1_measure",
     greater_is_better = True,
     ignore_data_skip = False,
     fsdp = '',
@@ -152,11 +209,11 @@ training_arguments = TrainingArguments(
 
 from transformers import Trainer
 trainer = Trainer(
-    model = model,
-    args = training_arguments,
-    train_dataset = dataset_dict['train'],
-    eval_dataset = dataset_dict['validation'],
-    compute_metrics = compute_metrics
+    model=model,
+    args=training_arguments,
+    train_dataset=dataset_dict['train'],
+    eval_dataset=dataset_dict['validation'],
+    compute_metrics=compute_metrics
 )
 
 # Train
