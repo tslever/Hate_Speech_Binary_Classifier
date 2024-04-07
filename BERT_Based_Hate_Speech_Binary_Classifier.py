@@ -111,7 +111,7 @@ training_arguments = TrainingArguments(
     gradient_accumulation_steps = 1,
     #eval_accumulation_steps
     #eval_delay
-    learning_rate = 5e-5,
+    learning_rate = 1e-5,
     weight_decay = 0,
     adam_beta1 = 0.9,
     adam_beta2 = 0.999,
@@ -209,13 +209,14 @@ training_arguments = TrainingArguments(
     #optim_target_modules
 )
 
-from transformers import Trainer
+from transformers import Trainer, EarlyStoppingCallback
 trainer = Trainer(
     model = model,
     args = training_arguments,
     train_dataset = dictionary_of_training_and_validation_data_sets['training'],
     eval_dataset = dictionary_of_training_and_validation_data_sets['validation'],
-    compute_metrics = compute_metrics
+    compute_metrics = compute_metrics,
+    callbacks = [EarlyStoppingCallback(early_stopping_patience = 5)]
 )
 
 
