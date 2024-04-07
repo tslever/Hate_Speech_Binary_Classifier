@@ -35,10 +35,12 @@ def softmax(x, axis = None):
     e_x = np.exp(x - np.max(x, axis = axis, keepdims = True))
     return e_x / e_x.sum(axis = axis, keepdims = True)
 
+path_to_training_output = "./training_output_2"
+
 import os
 def compute_metrics(evalPrediction):
-    if not os.path.exists('./training_output'):
-        os.makedirs('./training_output')
+    if not os.path.exists(path_to_training_output):
+        os.makedirs(path_to_training_output)
     numpy_array_of_logits, numpy_array_of_labels = evalPrediction # 1000 x 2, 1000 x 1
     numpy_array_of_probabilities = softmax(numpy_array_of_logits, axis = 1)[:, 1]
     numpy_array_of_thresholds = np.linspace(0, 1, 101)
@@ -82,7 +84,7 @@ def compute_metrics(evalPrediction):
     global global_step
     global_step += 500
     data_frame_of_performance_metrics.to_csv(
-        path_or_buf = f"./training_output/Data_Frame_Of_Performance_Metrics_After_{str(global_step).zfill(7)}_Steps.csv",
+        path_or_buf = f"{path_to_training_output}/Data_Frame_Of_Performance_Metrics_After_{str(global_step).zfill(7)}_Steps.csv",
         index = False
     )
     return {
@@ -100,18 +102,18 @@ model = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased", 
 from transformers import TrainingArguments
 # For descriptions of all parameters to constructor TrainingArguments, see https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py .
 training_arguments = TrainingArguments(
-    output_dir = "./training_output",
+    output_dir = path_to_training_output,
     overwrite_output_dir = True,
     do_train = True,
     do_eval = True,
     do_predict = True,
     evaluation_strategy = "steps",
-    per_device_train_batch_size = 8,
+    per_device_train_batch_size = 16,
     per_device_eval_batch_size = 8,
     gradient_accumulation_steps = 1,
     #eval_accumulation_steps
     #eval_delay
-    learning_rate = 1e-5,
+    learning_rate = 3e-5,
     weight_decay = 0,
     adam_beta1 = 0.9,
     adam_beta2 = 0.999,
