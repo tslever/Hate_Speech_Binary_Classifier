@@ -35,7 +35,7 @@ def softmax(x, axis = None):
     e_x = np.exp(x - np.max(x, axis = axis, keepdims = True))
     return e_x / e_x.sum(axis = axis, keepdims = True)
 
-path_to_training_output = "./training_output_2"
+path_to_training_output = "./training_output"
 
 import os
 def compute_metrics(evalPrediction):
@@ -186,7 +186,7 @@ training_arguments = TrainingArguments(
     #dataloader_prefetch_factor
     skip_memory_metrics = True,
     push_to_hub = False,
-    #resume_from_checkpoint
+    resume_from_checkpoint = './training_output_3/checkpoint-8000',
     #hub_model_id
     hub_strategy = "every_save",
     #hub_token
@@ -223,4 +223,4 @@ trainer = Trainer(
 
 
 # Train
-trainer.train()
+trainer.train(resume_from_checkpoint = True)
