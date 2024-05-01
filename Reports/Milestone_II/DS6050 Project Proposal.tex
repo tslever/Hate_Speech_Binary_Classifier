@@ -1,0 +1,189 @@
+\documentclass[conference]{IEEEtran}
+%\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{url}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{underscore}
+\usepackage{setspace}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Overleaf Example},
+    pdfpagemode=FullScreen,
+    }
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+
+\title{Identifying Online Hate Speech \\
+Model Architecture, Experiments and Preliminary Results\\
+}
+
+\author{\IEEEauthorblockN{Hannah Koizumi}
+\IEEEauthorblockA{\textit{School of Data Science} \\
+\textit{University of Virginia}\\
+Charlottesville, USA\\
+hek3bm@virginia.edu}
+\and
+\IEEEauthorblockN{Anonymous}
+\IEEEauthorblockA{\textit{School of Data Science} \\
+\textit{University of Virginia}\\
+Charlottesville, USA\\
+Anonymous@virginia.edu}
+\and
+\IEEEauthorblockN{Thomas Lever}
+\IEEEauthorblockA{\textit{School of Data Science} \\
+\textit{University of Virginia}\\
+Charlottesville, USA\\
+tsl2b@virginia.edu}
+\
+}
+
+\maketitle
+
+\begin{abstract}
+\textbf{The rise in online hate speech over the past 10 years has led most social media companies to update their policies to explicitly condemn and remove hate speech and ban its perpetrators. However, the constant evolution of hate speech and the tremendous amount of content to analyze are significant barriers to detection. In our experiment, we tuned and trained variants of Bidirectional Encoder Representations from Transformers (BERTs) on three labeled hate speech data sets. The test data used was sampled from Reddit comments submitted 30 days before and after June 29, 2020. On that date Reddit posted a major content policy change targeted at hate speech and other offensive posts. We hope to understand model performance and the limits of these models in identifying hate speech in Reddit comments.}
+\end{abstract}
+
+\begin{IEEEkeywords}
+natural language processing, language models, text analysis, language parsing and understanding, neural models, ethical/societal implications, Reddit
+\end{IEEEkeywords}
+
+
+\section{Introduction}
+The ever-expanding corpus of online hate speech remains a relevant topic of public discourse around free speech and what responsibility social media companies have to monitor content on their platforms. In the United States, this increase in online hate speech led some social media companies to tighten bans on certain types of speech by changing their user policies. However, one particularly vexing issue remains for United States based social media ---the lack of a “blanket definition of hate speech under American law, which is generally much more permissive than other countries because of the First Amendment to the US Constitution”\cite{b1}. 
+
+Most major social media platforms have banned hate speech and use automated hate speech detection\cite{b2}. For example, in 2017, Twitter implemented new policies to remove hateful and abusive speech from their platform\cite{b3}; however, research has shown an increase in hate speech on Twitter (now X) after Elon Musk purchased the company\cite{b1}. In 2020, Reddit updated their content policy in an attempt to discourage inappropriate speech, specifically citing the desire to reduce hate speech\cite{b4}. It is this shift in policy that is the basis of our project ---identifying online hate speech.
+
+Complicating moderation of hate speech is algospeak. Algospeak rose as “... a communicative practice in reaction to experiencing content moderation on a platform” and to “circumvent... algorithmic content moderation\cite{b5}. Algospeak is “commonly understood as abbreviating, misspelling, or substituting specific words... when creating a social media post with the particular goal to circumvent a platform’s content moderation systems”\cite{b5}. Algospeak has its roots in a backlash to Google Jigsaw’s Conversation AI, which was introduced in 2016\cite{b6}. The limits of automatic hate speech detection is a challenge. Our research for this project has not yet specifically identified deep learning models that have been adapted to understand algospeak.
+
+To support our project proposal, we reviewed scholarly literature related to the detection of online hate speech through deep learning methods. We also identified potential sources for labeled training data and unlabeled Reddit testing data to be used in conjunction with pre-trained language models. Our goal is to examine the performance of and possibly improve specific pre-trained hate speech or other Natural Language Processing (NLP) deep learning models on Reddit submissions and comments prior to and after Reddit made a major content policy change on June 29, 2020.
+
+\section{Motivation}
+The motivation behind this project is the belief that deep learning models may have great potential to process and detect hate speech in a large sea of content, likely contaminated with hate speech, leading up to the 2024 U.S. presidential election. Moderating online content, while respecting the generally recognized First Amendment right to freedom of speech, is and will continue to be one of the greatest challenges of our generation, particularly with the already significant increase in User-Generated Content (UGC) and Artificial Intelligence Generated Content (AIGC).
+
+Our proposed project will attempt to connect data science with social media policy changes. Through this connection, we may be able to trace the evolution of hate speech on the Reddit platform as users reacted to these changes. This approach could offer new perspectives to researchers related to trends in hate and violent speech. Researchers may want to consider these trends when creating new models or updating existing models used to detect hate speech. There is no doubt this type of modeling along with frequent updates to these models will be an ongoing need as the online social media landscape constantly adapts and evolves.
+
+\section{Literature Survey}
+
+\subsection{Overview}
+It is widely known that social media companies are not well-equipped to filter through the immense amount of inappropriate speech on their platforms. There are different facets of hate speech online and, as Jahan and Oussalah\cite{b7} point out, there are distinctions in definitions of hate speech based on country of origin, sector (academic versus political), and among social media platforms themselves. For the purpose of this literature review, the definition of hate speech will remain flexible enough to focus on the various methodologies used to identify inappropriate speech. Such inappropriate speech can also be defined as hateful, abusive, and/or violent.
+
+\subsubsection{Online Social Media Review Process}
+Pre-published and post-published reviews are the two current approaches to monitoring social media posts. Pre-published social media is either human reviewed or put through a simple filter prior to posting online. One study’s authors write, “Human moderation of all content is expensive and lacks scalability, while word filters lack the ability to detect more subtle semantic abuse”\cite{b8}. Post-published review allows posts to be published online. Once posted, platform moderators or crowd-sourced moderation identify negative posts which, if not removed by this filtering technique, could have significant negative consequences for the intended targets \cite{b8}. The lack of reliable and non-human intensive mechanisms which filter and remove hate speech is a main motivation for researchers to build and test machine learning models.
+
+\subsubsection{Data Availability and Distribution}
+The volume of data posted on social media platforms is not the only barrier to correctly identifying and subsequently removing hate speech. Imbalanced class distribution with extremely low levels of abusive speech create challenges to models\cite{b8}, especially models trained on unlabeled data. Nuances in online speech also create detection issues due to the subtle ways that hate speech can be portrayed through sarcasm or stereotypes\cite{b9}]; as a result, models may overlook hate speech. Though the work in non-English hate speech has increased, English, because initial modeling work was accomplished with an English corpus, remains dominant. Inroads have been made in other language models and the number of “... non-English hate speech detection toolkits have seen a steady increase”\cite{b7}.
+
+\subsubsection{Traditional versus Deep Learning Model Performance}
+Despite challenges discussed in the Data Availability and Distribution section, some studies show that deep learning models outperform traditional machine learning classifiers\cite{b10},\cite{b11}. Typical machine learning classifiers such as Support Vector Machines (SVM) and Naïve-Bayes classifiers lack the ability to capture syntactic information and also generally ignore word order\cite{b8}. SVM models were shown to perform better on smaller rather than large datasets, which could be problematic in this era of big data. Examples were cited where SVM performance was poor with balanced datasets but where performance improved when oversampling methods were applied to the datasets\cite{b9} Data augmentation can expand the minority class to help balance an otherwise imbalanced dataset\cite{b8}. In a survey of hate speech detection, the authors found that CNN, RNN, and BERT (Bidirectional Encoder Representations from Transformers) “... have demonstrated remarkable abilities in detecting hate speech and analyzing sentiment in online content since their introduction\cite{b12}. 
+
+\subsubsection{Pre-Trained Models}
+Transformer-based deep learning models using attention mechanisms alongside predictions may improve hate speech detection results. “These models are typically pre-trained on extensive text corpora and subsequently fine-tuned for specific downstream tasks, enabling them to deliver exceptional performance even with limited training data”\cite{b9}. Among transformer-based models, BERT is rising in popularity with multiple researchers citing it as the superior deep learning architecture\cite{b9}. Other recent transformer-based models include BERT variants such as, but not limited to, FinBERT, RoBERTa, ALBERT, and DistilBERT\cite{b13}. 
+
+\section{Method}
+Our method is focused on BERT-based binary classifiers and their ability to identify unlabeled hate speech. The BERT family is a natural first step because it is an industry standard and is pre-trained on a large corpus. Our plan is to use BERT family models including BERT, distilBERT, and bert-tiny to train labeled hate speech data sets in order to test unlabeled Reddit comment submissions from the month leading up to and the month after Reddit’s June 29, 2020, policy change. Given the size of the data files and resource constraints, we plan to sample the days leading up to and after this policy change. The sample size has not yet been refined. The labeled training/validation data sets are from Kaggle\cite{b14} and Hugging Face\cite{b15}. Our approach is well supported by the code, data sets, and documentation described on Hugging Face, GitHub\cite{b16}, and Medium\cite{b17}.
+
+\section{Preliminary Experiments}
+  Our preliminary experiments weighed heavily on test data acquisition and cleaning followed by model creation (involving a final layer on top of BERT-family models), training and validation. One testing run was accomplished on a bert-tiny model to ensure the test model coding was working. However, the goal of the preliminary experiments was to identify pre-trained models and train their last layer on labeled hate speech data that contained content from Reddit. 
+
+\subsection{Acquire and Clean Data}
+We sought to identify a source of raw data that encompassed all submissions and comments. A valid torrent was identified that met this requirement. The torrent files\cite{b18} for June and July 2020 were torrented, uncompressed, uploaded into a Jupyter Notebook and converted to Pandas dataframes. The data were systematically explored and cleaned by removing rows and columns not relevant to our analysis. Saving the resulting data frames as a feather file allowed them to be shared with the entire team. 
+
+\subsection{Training Datasets}
+ For this project, we trained several BERT-based binary classifiers with labeled hate speech datasets from two sources. The first attempt with a binary classifier based on the full BERT model with a large training dataset (over 400k rows) revealed the importance of adequate computing memory on local machines. Rivanna and Google Colab environments also initially presented resource issues. Rivanna was finally able to be used to train and validate a full BERT-based hate speech binary classifier.
+ 
+To train the models, we identified three hate speech datasets containing text from both Reddit and Twitter. Two hate speech datasets were available from the Kaggle source: one dataset (HateSpeechDataset) with 417,561 rows of preprocessed data labeled 1 (hate speech) or 0 (not hate speech) and one date set (HateSpeechDatasetBalanced) with 700,067 rows of preprocessed and augmented data to balance the original dataset. The ETHOS dataset contained 998 online comments and was more balanced in its ratio of comments containing hate speech and no hate speech detected. It became clear that the imbalanced nature of the initial hate speech dataset hindered the performance of the models, so a balanced version of the dataset was used and improved initial results.
+
+\subsection{Identify Potential Models}
+We identified the Hugging Face library\cite{b19} as a reliable source of binary classifier transformer models. BERT is a resource intensive model which led to the development of models such as bert-tiny. Bert-tiny was developed to run in the resource constrained environments students typically work in and as such have inherent limitations with fine-tuning\cite{b20}. 
+
+\subsubsection{Model One} The first model identified was a BERT-based binary classifier. This robust model\cite{b21} initially presented resource challenges to the team on local machines, Rivanna, and Google Colab. After much effort, the binary classifier was modified to run within Rivanna. The model successfully trained on our labeled unbalanced hate speech data set after setting up checkpoints\cite{b22}. Throughout the initial phase of training, involving 3000 backpropagations, the binary classifier model demonstrated promising validation accuracy, with values ranging from 81\%\ to 86.6\%.
+
+\subsubsection{Model Two}The second model identified, due to resource constraints with the BERT-based binary classifier, was a binary classifier based on distilBERT, which is a “small, fast, cheap and light Transformer model trained by distilling BERT base. It has 40\%\ less parameters than google-bert/bert-base-uncased, runs 60\%\ faster while preserving over 95\%\ of BERT’s performances as measured on the GLUE language understanding benchmark”\cite{b23}. The initial round of training/validation on the ETHOS dataset realized an accuracy of 84\%\ and a precision of 78\%\cite{b24}.
+
+\subsubsection{Model Three}The third model identified was a binary classifier based on bert-tiny\cite{b20}, which originates from Tensorflow checkpoints found in the official Google BERT repository. The model is a PyTorch pre-trained model designed for the last layer to be trained on a downstream task\cite{b25}. Bhargava, Drozd, and Roger\cite{b25} reported that bert-tiny with 4.4M parameters did not perform worse than bert-medium with 41.7M parameters, showing that more parameters do not necessarily result in better generalization and performance in models. 
+
+The bert-tiny model was run on both the balanced and imbalanced versions of the hate speech data set. The initial results were 86.4\%\ accuracy, 83.9\%\ precision, 90.3\%\ recall and a F1 of 87.0\%\ for the balanced data set. The learning rate hyperparameter is by far the most important (96\%) over batch sizes. The imbalanced dataset had 89.2\%\ accuracy, 73.5\%\ precision, 62.0\%\ recall, and a F1 of 67.3\%\cite{b24}. It is clear that while the imbalanced data, when trained on a few runs, has a higher accuracy rate. The overall results for the balanced dataset show more promise precisely due to its balanced data. 
+
+\section{Next Steps}
+We successfully loaded cleaned Reddit files into JupyterLab, trained and validated several models and completed one test run with bert-tiny. The test run results provided us with insight into approximately 1.7M comments in the first days of July 2020. Several visualizations were prepared to look at the top 50 subreddits with comments in this dataset as well as a word cloud for both Class 0 (not hate speech) and Class 1 (hate speech) and a histogram\cite{b24}(current results folder). 
+
+The next steps are to tune the models to maximize their performance on the labeled datasets. This will be based on metrics such as validation accuracy, precision, recall, and F1. Once the models are tuned, we will run the models on two test data sets that relate to before and after the Reddit policy change. As the test data are unlabeled, this will be an unsupervised learning experiment. We plan to compare results between the models related to predictions of hate speech using the same test sets. Qualitative analysis will be used to compare the comments that one model deemed as hate speech and the other did not, which will be comments in the middle quartiles of the log probability output.
+
+Lastly, a BERT-based binary classifier may be used to test a subset of the labeled data in order to provide another perspective on hate speech identification. 
+
+\section{Team Member Contributions}
+
+\subsection{Thomas Lever Contributions}
+
+\begin{itemize}
+  \item Prepared from the Reddit API data from Reddit
+  \item Tuned, trained, and validated a hate speech binary classifier using AutoModelForSequenceClassification, bert-base-uncased, and HateSpeechDataset.csv
+ \item Edited “Identifying Online Hate Speech: Literature Review and Project Proposal"
+ \item Completed first draft and edited final draft of Milestone II submission
+ \item Asked questions of other groups and provided personal responses to questions to our group during Milestone I presentation
+\end{itemize}
+
+\subsection{Hannah Koizumi Contributions}
+
+\begin{itemize}
+  \item Set up weekly meetings on Zoom/Set up project Teams channel \&\ Refined idea for NLP project
+  \item Identified 2 recent and relevant labeled hate speech training data sets \&\ Identified BERT model, coded for training and validating datasets
+  \item Training and tuning distilBert model on local machine 
+  \item Researched and compiled extensive Literature Review
+  \item Drafted \&\ edited Milestone I Literature Review and Project Proposal in Word and Overleaf \&\ Edited and reviewed Milestone II drafts in Word and Overleaf
+  \item Co-presented Milestone I presentation
+  \item Drafted questions for Milestone I group presentations and answered this group's questions posed by other teams
+\end{itemize}
+
+\subsection{Anonymous Contributions}
+
+\begin{itemize}
+   \item Create weekly meeting agendas \&\ Provided additional research for Literature Review
+   \item Identified ETHOS dataset as another training set option
+   \item Provided team with model code for distilBert and bert-tiny \&\ Coded Reddit API using \href{https://praw.readthedocs.io/en/stable/}{PRAW} for potential use  \item Identified and torrented data for unlabeled Reddit test set
+   \item Processed torrent data, loaded into dataframes, stored for team use \&\ Cleaned data to ready for tokenization in the BERT models
+   \item Identified distilBERT \&\ bert-tiny models as options to BERT, coded for training and validating datasets \&\ On bert-tiny, tuned both hate speech datasets, coded testing and ran model to ensure usability
+   \item Edited and reviewed Milestone I \&\ II drafts in Word \&\ Overleaf \&\ Created final versions of Milestone I and II and submitted in Canvas for team \&\ Created Milestone I presentation and co-presented    
+ \end{itemize}
+
+\begin{thebibliography}{00}
+
+\bibitem{b1}"The Musk bump: quantifying the rise in hate speech under Elon Musk." Center for Countering Digital Hate. \href{https://counterhate.com/blog/the-musk-bump-quantifying-the-rise-in-hate-speech-under-elon-musk}{https://counterhate.com/blog/the-musk-bump-quantifying-the-rise-in-hate-speech-under-elon-musk/} (accessed March 7, 2024).
+\bibitem{b2}F. Nascimento, G. Cavalcanti, and M. Da Costa-Abrue. “Exploring automatic hate speech detection on social media: a focus on content-based analysis.", vol 13, iss 2, 2023. \href{https://doi.org/10.1177/21582440231181311}{https://doi.org/10.1177/21582440231181311} (accessed March 8, 2024).
+\bibitem{b3}D. Lee. “Twitter's hate speech rules are expanded.” BBC. \href{https://www.bbc.com/news/technology-42376546}{https://www.bbc.com/news/technology-42376546} (accessed March 7, 2024).
+\bibitem{b4} “Reddit content policy.” Reddit. \href{https://www.redditinc.com/policies/content-policy}{https://www.redditinc.com/policies/content-policy} (accessed March 5, 2024).
+\bibitem{b5}E. Steen, K. Yurechko, and D. Klug. "You can (not) say what you want: using algospeak to contest and evade algorithmic content moderation on TikTok. Social Media + Society, vol 9, iss 3, 2023. \href{https://doi.org/10.1177/20563051231194586}{https://doi.org/10.1177/20563051231194586} (accessed March7, 2024).
+\bibitem{b6}A. Greenberg. "Inside Google’s internet justice league and its AI-powered war on trolls.", Wired, September 19, 2016. https://www.wired.com/2016/09/inside-googles-internet-justice-league-ai-powered-war-trolls/ (accessed March 8, 2024).
+\bibitem{b7}M. Jahan and M. Oussalah. "A systematic review of hate speech automatic detection using natural language processing." in Neurocomputing, vol 546, 2023. \href{https://doi.org/10.1016/j.neucom.2023.126232}{https://doi.org/10.1016/j.neucom.2023.126232} (accessed March 7, 2024).
+\bibitem{b8}H. Chen, S. McKeever, and S.J. Delany. "A comparison of classical versus deep learning techniques for abusive content detection on social media sites." In: S. Staab, O. Koltsova, and D. Ignatov (eds) Social Informatics. SocInfo 2018. Lecture Notes in Computer Science(), vol 11185. \href{https://link.springer.com/book/10.1007/978-3-030-01129-1}{https://link.springer.com/book/10.1007/978-3-030-01129-1} (accessed March 7, 2024).
+\bibitem{b9}A. Marshan, F.N.M Nizar, A. Ioannou, and K. Spanaki. "Comparing machine learning and deep learning techniques for text analytics: detecting the severity of hate comments online." Information System Frontiers. 2023. \href{https://doi.org/10.1007/s10796-023-10446-x}{https://doi.org/10.1007/s10796-023-10446-x} (accessed March 7, 2024).
+\bibitem{b10}T. Lynn, P. T. Endo, P. Rosati, I. Silva, G. L. Santos, and D. Ging, "A comparison of machine learning approaches for detecting misogynistic speech in urban dictionary." 2019 International Conference on Cyber Situational Awareness, Data Analytics And Assessment, pp. 1-8, 2019. \href{https://doi.org/10.1109/CyberSA.2019.8899669}{https://doi.org/10.1109/CyberSA.2019.8899669} (accessed March 7, 2024).
+\bibitem{b11}B. Gambäck, U.K. Sikdar. "Using convolutional neural networks to classify hate-speech.", Association for Computational Linguistic, pp. 85-90, 2017. \href{https://doi.org/10.18653/v1/w17-3013} 
+{https://doi.org/10.18653/v1/w17-3013} (accessed March 2, 2024).
+\bibitem{b12}M. Subramanian, V.E. Sathiskumar, G. Deepalakshmi, J. Cho, and G. Manikandan. "A survey on hate speech detection and sentiment analysis using machine learning and deep learning models." Alexandria Engineering Journal, vol 80, pp.110-121, 2023. \href{https://doi.org/10.1016/j.aej.2023.08.038}{https://doi.org/10.1016/j.aej.2023.08.038} (accessed March 7, 2024).
+\bibitem{b13} V. Mathur. "BERT And its model variants.", May 11, 2023. \href{https://medium.com/aimonks/bert-and-its-model-variants-162bb292611c}{https://medium.com/aimonks/bert-and-its-model-variants-162bb292611c} (accessed March 8, 2024).
+\bibitem{b14} D. Mody, Y. Huang, and T. deOliveria. "A curated dataset for hate speech detection on social media text.", Data in Brief, vol 46, February 2023. \href{https://www.sciencedirect.com/science/article/pii/S2352340922010356?via%3Dihub} (accessed March 10, 2024).
+\bibitem{b15} I. Mollas, Z. Chrysopooulou, S. Karlos, and G. Tsoumakas. "ETHOS: an online hate speech detection dataset.", Complex \&\ Intelligent Systems, vol 8, pp. 4663-4678, January 4, 2022. \href{https://arxiv.org/pdf/2006.08328.pdf} (accessed March 15, 2024).
+\bibitem{b16}J. Devlin. Google Research BERT Github, \href{https://github.com/google-research/bert}{https://github.com/google-research/bert} (accessed March 15, 2024).
+\bibitem{b17} P. Dholaykia. "Twitter hate detection using: HuggingFace BERT fine-tuning.", Medium, February 10, 2023. \href{https://medium.com/@parthdholakiya180/twitter-hate-detection-using-bert-e7682b2d0a0c}{https://medium.com/@parthdholakiya180/twitter-hate-detection-using-bert-e7682b2d0a0c} (accessed March 24, 2024).
+\bibitem{b18} stuck_in_the_matrix, Watchful1, and RaiderBDev. "Reddit comments/submissions 2005-06 to 2023-12.", \href{https://academictorrents.com/details/9c263fc85366c1ef8f5bb9da0203f4c8c8db75f4}{https://academictorrents.com/details/9c263fc85366c1ef8f5bb9da0203f4c8c8db75f4} (accessed March 8, 2024).
+\bibitem{b19} "Transformers".\href{https://huggingface.co/docs/transformers/index}{https://huggingface.co/docs/transformers/index} (accessed March 29, 2024).
+\bibitem{b20} I. Turc, M.W. Chang, K. Lee, and K. Toutanova. "Well-Read students learn better: on the importance of pre-training compact models.", September 25, 2019. \href{https://arxiv.org/pdf/1908.08962v2.pdf}{https://arxiv.org/pdf/1908.08962v2.pdf} (accessed March 15, 2024).
+\bibitem{b21} J. Develin, M.W. Chang, K. Lee, and K. Toutanova. "BERT: pre-training of deep bidirectional transformers for language understanding.", May 24, 2019. \href{https://arxiv.org/pdf/1810.04805.pdf}{https://arxiv.org/pdf/1810.04805.pdf} (accessed March 29, 2024).
+\bibitem{b22} T. Lever. Hatespeech Binary Classifier Github Repository., \href{https://github.com/tslever/Hate_Speech_Binary_Classifier}{https://github.com/tslever/Hate_Speech_Binary_Classifier} (accessed March 31, 2024).
+\bibitem{b23}V. Sanh, L. Debut, J. Chaumond, and T. Wolf. "DistilBERT, a distilled version of BERT: smaller, faster, cheaper and lighter.", March 1, 2020. \href{https://arxiv.org/abs/1910.01108}{https://arxiv.org/abs/1910.01108} (accessed March 20, 2024). 
+\bibitem{b24} DS 6050 Teams Channel, \href{https://myuva.sharepoint.com/:f:/s/DeepLearningProject197/EhqdcbyWnR1NmhQ6Ncn4oREBEb3JMQX6_L0OdURiePC_Vg?e=zbRngc}{Teams Channel} (accessed March 31, 2024).
+\bibitem{b25} P. Bhargava, A. Drozd, and A. Rogers. "Generalization in NLI: ways (not) to go beyond simple heuristics.", October 4, 2021. \href{https://arxiv.org/pdf/2110.01518.pdf}{https://arxiv.org/pdf/2110.01518.pdf} (accessed March 29, 2024). 
+
+\end{thebibliography}
+\end{document}

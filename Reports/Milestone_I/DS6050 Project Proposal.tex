@@ -1,0 +1,209 @@
+\documentclass[conference]{IEEEtran}
+%\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{url}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{underscore}
+\usepackage{setspace}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Overleaf Example},
+    pdfpagemode=FullScreen,
+    }
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+
+\title{Identifying Online Hate Speech \\
+Literature Review and Project Proposal\\
+}
+
+\author{\IEEEauthorblockN{Hannah Koizumi}
+\IEEEauthorblockA{\textit{School of Data Science} \\
+\textit{University of Virginia}\\
+Charlottesville, USA\\
+hek3bm@virginia.edu}
+\and
+\IEEEauthorblockN{Anonymous}
+\IEEEauthorblockA{\textit{School of Data Science} \\
+\textit{University of Virginia}\\
+Charlottesville, USA\\
+Anonymous@virginia.edu}
+\and
+\IEEEauthorblockN{Thomas Lever}
+\IEEEauthorblockA{\textit{School of Data Science} \\
+\textit{University of Virginia}\\
+Charlottesville, USA\\
+tsl2b@virginia.edu}
+\
+}
+
+\maketitle
+
+
+\begin{abstract}
+\textbf{The rise in online hate speech over the past 10 years has led most social media companies to update their policies to explicitly condemn and remove hate speech and its perpetrators. However, the constant evolution of hate speech and the tremendous amount of content to analyze are significant barriers to detection. There are many machine and deep learning models created and tested by researchers; however, lack of transparency of the models and the data create a lack of reproducibility. In this experiment, we propose testing pre-trained existing models on Reddit data before and after 2020, when they made significant changes to their policies to address hate speech. In this way, we can contribute more information on the available models' performance, and we are hoping to detect trends in online hate evolution.}
+\end{abstract}
+
+\begin{IEEEkeywords}
+natural language processing, language models, text analysis, language parsing and understanding,\
+neural models, ethical/societal implications
+\end{IEEEkeywords}
+
+
+\section{Introduction}
+The ever-expanding corpus of online hate speech remains a relevant topic of public discourse around free speech and what responsibility of social media companies have to monitor content on their platforms. In the United States, this increase in online hate speech led some social media companies to tighten bans on certain types of speech by changing their user policies. However, there remains one particular vexing issue for United States based social media -- the lack of a "blanket definition of hate speech under American law, which is generally much more permissive than other countries because of the First Amendment to the US Constitution"\cite{b1}. 
+
+On the flip side of online regulation is the European Union. Its Digital Services Act (DSA), enacted in October 2022 and fully implemented on February 17, 2024, creates a comprehensive framework of regulatory standards to:
+\begin{itemize}
+    \item "to provide a safe digital environment free from illegal content
+    \item to enhance transparency and accountability on the service provider side
+    \item to strengthen the protection of fundamental European and consumer rights
+    \item to strengthen enforcement (esp. in the cross-border situations)"\cite{b2}
+\end{itemize}
+
+Most major social media platforms have banned hate speech and use automated hate speech detection\cite{b3}. For example, in 2017, Twitter implemented new policies to remove hateful and abusive speech from their platform\cite{b4} however research has shown an increase in hate speech on Twitter/X after Elon Musk purchased the company\cite{b1}. In 2020, Reddit updated their content policy in an attempt to discourage inappropriate speech, specifically citing the desire to reduce hate speech.\cite{b5} It is this shift in policy that is the basis of our project -- identifying online hate speech. 
+
+Complicating moderation of hate speech is algospeak. Algospeak rose as "...a communicative practice in reaction to experiencing content moderation on a platform" and to "circumvent ... algorithmic content moderation\cite{b6}. Algospeak, “commonly understood as abbreviating, misspelling, or substituting specific words…when creating a social media post with the particular goal to circumvent a platform’s content moderation systems”\cite{b6}. Algospeak has its roots in a backlash to Google Jigsaw's Conversation AI. Introduced in 2016 as a tool to "...use machine learning to automatically spot the language of abuse and harassment -- with, Jigsaw engineers say, an accuracy far better than any keyword filter and far faster than any team of human moderators"\cite{b7}. 
+
+A group, ultimately self-named Operation Google, was formed on \href{https://archive.4plebs.org/pol/thread/89784922}{4chan}, two days after Google introduced the model\cite{b8}. Words substitution were voted on and accepted included pepe for alt-right, car salesman for liberals/democrats, and reagans for conservatives. Included in the list are also substitutions for more offensive terms related to race, religion, etc.\cite{b8}. Reddit [r/technology] has a \href{https://www.reddit.com/r/technology/comments/543a1q/4chan_and_pol_are_launching_operation_google/}{thread} dedicated to this topic\cite{b9} from 2016 which was not removed in the 2020 content policy update purge. The thread that was not removed is likely due to the use of algospeak throughout the thread -- see post by TheFAPnetwork in this thread whose account is suspended. The limits of automatic hate speech detection is a challenge and our research for this project did not yet specifically identify deep learning models that have been adapted to understand algospeak. 
+
+To support our project proposal, we reviewed scholarly literature related to the detection of online hate speech through deep learning methods. We also identified potential sources for unlabeled Reddit data to be used in conjunction with these pre-trained language models. Our goal is to examine the performance of specific pre-trained hate speech or other Natural Language Processing (NLP) deep learning models on Reddit comments and submissions prior to and after Reddit made these policy changes.  
+
+\section{Literature Review}
+
+\subsection{Summary of Existing Literature}
+
+It is widely known that social media companies are not well-equipped to filter through the immense amount of inappropriate speech on their platforms. There are different facets of hate speech online and, as Jahan and Oussalah\cite{b10} point out, there are distinctions in definitions of hate speech based on country, sector (academic versus political), and among social media platforms themselves. For the purpose of this literature review, the definition will remain flexible enough to focus on the various methodologies used to identify inappropriate speech which can also be defined as hate, abusive, violent, etc. 
+
+\subsubsection{Online Social Media Review Process}
+Pre-published and post-published reviews are the two current approaches to monitoring social media posts. Pre-published social media is either human reviewed or put through a simple filter prior to posting online. One study's authors write, "Human moderation of all content is expensive and lacks scalability, while word filters lack the ability to detect more subtle semantic abuse"\cite{b11}. Post-published review allows posts to be published online and then moderators or crowd-sourcing moderation identify negative posts which, if not removed by this filtering technique could have significant negative consequences to the intended targets\cite{b11}. The lack of reliable and non-human intensive mechanisms which filter and remove hate speech is a main motivation for researchers to build and test both machine learning and deep learning models. 
+
+\subsubsection{Data Availability and Distribution}
+The volume of data posted on social media platforms is not the only barrier to correctly identifying and subsequently removing hate speech. Imbalanced class distribution with extremely low levels of abusive speech create challenges to models\cite{b11}. Nuances in online speech also create detection issues due to the subtle ways that hate speech can be portrayed through sarcasm or stereotypes\cite{b12}; as a result, models may overlook hate speech. Though the work in non-English hate speech has increased, English, because initial modeling work was accomplished with an English corpus, remains dominant, and there have been inroads made in other language models and "...non-English hate speech detection toolkits have seen a steady increase"\cite{b10}.
+
+Data augmentation is one method that can be used to overcome imbalanced data sets in deep learning models. A new technique, Imbalanced Data Augmentation (IDA) can improve the prediction of the minority class (hate speech) by "...enhancing the size of the minority class by replacing uninformative words while preserving the class label, and secondly, augmenting the entire data size by inserting stop words into each data sentence"\cite{b13}.  
+
+\subsubsection{Pre-Processing}
+Pre-processing is an important step for deep learning models. First, this step allows for data to be cleaned and standardized, thus reducing noise. Second, normalization, as a pre-processing step, standardizes the data. For text data, this step can include converting to all lowercase, stemming, and lemmatization. Tokenization is another key process that breaks the text into words or phrases. Removing stop words such as "and", "the", "or" and "a" reduce the dataset size and can improve processing speed. Lastly, transforming text into an appropriate format such that a model can easily use the data involves conversion of data into numerical vectors via techniques such as Bag of Words (BOW), Term Frequency–Inverse Document Frequency (TF-IDF) or word embeddings such as Word2vec or Global Vectors for Word Representation (GloVE). This conversion allows models to understand and generate patterns. Ultimately, pre-processing steps allow models to train faster and more efficiently thereby reducing the load on resources\cite{b14}. 
+
+\subsubsection{Traditional versus Deep Learning Model Performance}
+Despite challenges discussed in the data availability and distribution section, some studies show that deep learning models outperform traditional machine learning classifiers\cite{b15},\cite{b16}. Typical machine learning classifiers such as Support Vector Machines (SVM) and Naive Bayes lack the ability to capture syntactic information and also generally ignore word order\cite{b11}. SVM models were shown to perform better on smaller rather than large datasets which could be problematic in this era of big data. Marshan, Nizar, Ioannou, and Spanaki also cited examples where SVM performance was poor with balanced datasets but when oversampling methods were applied to the datasets, performance improved\cite{b12}.
+
+Deep learning models tend to perform better on imbalanced datasets because of their greater capacity to learn complex patterns from data. Manual feature engineering, a trait of traditional machine learning models, is replaced by automatic learning and feature extraction. Additionally, as discussed above, data augmentation can expand the minority class to help balance an otherwise imbalanced dataset\cite{b11}. 
+
+Chen, McKeever and Delany\cite{b11} compared the performance of a Convolutional Neural Network (CNN) to a Recurrent Neural Network (RNN) in identifying content and found improvement with an ensemble model rather than a single classifier; others have agreed that ensemble models are superior\cite{b11}. In a survey of hate speech detection, Subramanian, Sathiskumar, Deepalakshmi, Cho, and Manikandan found that CNN, RNN, BERT "...have demonstrated remarkable abilities in detecting hate speech and analyzing sentiment in online content since their introduction\cite{b17}. 
+
+\subsubsection{Pre-Trained Models}
+Transformer-based, deep learning models using attention mechanisms alongside predictions, may improve hate speech detection results. “These models are typically pre-trained on extensive text corpora and subsequently fine-tuned for specific downstream tasks, enabling them to deliver exceptional performance even with limited training data”\cite{b12}. Among transformer-based models, Bidirectional Encoder Representations from Transformers (BERT) is rising in popularity with multiple researchers citing it as the superior deep learning architecture\cite{b10}. Other recent transformer-based models include all manner of BERT variants including but not exclusive: FinBERT, RoBERTa, ALBERT, and DistilBERT\cite{b18}. 
+
+\subsection{Evaluation of Current Literature}
+A fair amount of scholarly literature has been written on the proposed project topic, especially if the definition of hate speech is expanded to include harassment, violent, or abusive online speech. Most authors agree that the starting point must be to clearly define the type of speech being identified and that there likely will never be sufficient amounts of training data available compared to the amount of online hate speech posted every day. 
+
+Zimmerman, Kruschwitz and Fox\cite{b19} point out several critiques of the body of literature on hate speech detection models. The first critique is a lack of consistency in evaluation methods, which makes it difficult to compare results between individual studies\cite{b11}. The second is that there exists a low standard of reproducibility because researchers do not include important details related to their models such as weight initialization schemes, nor do the researchers share any code in general. 
+
+The implication of these shortfalls is that researchers may find it difficult to trust these findings without the ability to recreate published results. The inability to replicate these studies also can also contribute to poor consensus building related to these types of deep learning models. Some studies show that CNN models outperform long short-term memory (LSTM) models while other studies find the opposite\cite{b10}. Bashar and Nyak\cite{b20} compared a CNN model to a LSTM model and found that CNN models were better at discovering larger patterns within a post or comment, but this finding conflicts with the findings of Badjatiya, Gupta, Gupta and Varma\cite{b21} who found that LSTM models performed better than CNN models. Overall, this lack of transparency in previously tested models is a disservice to the research and the public at large on hate speech detection.
+
+\subsection{Proposed Future Research}
+One theme in researcher recommendations related to future research potential looks to testing different methodologies such as transfer learning\cite{b18}, LSTM for its character representation\cite{b22}, and different pre-processing techniques\cite{b12}. Our research indicates that the full arsenal of deep learning methods likely have not been tested on hate speech data as only 22\% of the algorithms used for hate speech detection are identified as deep learning algorithms\cite{b6} which could be the result of the relatively recent resurgence of deep learning models. 
+
+Also of concern is the move to algospeak and its ability to evade prior and current moderation whether human or machine. With minimal search efforts, hate speech from 2016 was easily found on Reddit in March 2024 -- one may wonder what else lies behind the wizard's curtain yet in plain sight.  Jahan and Oussalah build upon this observation with a discussion of annotation quality and the difficulty of standardization due to "loose" grammatical structure and "cross sentence boundaries"\cite{b10}. The authors recommend that datasets for hate speech should be continually updated as language evolves and good guidance provided to annotators as a good deal of labeling is done via crowd-sourcing. 
+
+Another set of future research recommendations comes from Zimmerman, Kruschwitz and Fox\cite{b19}, who recommend conducting a comparison of existing model weighting schemes in order to provide reproducibility assurances to this field of research. Multiple researchers recommended further testing of existing models on different datasets to prove their robustness\cite{b11},\cite{b19}. Overall, this research field needs reproducible testing on existing open source data to further confidence in these models. 
+
+Many, if not most studies on hate speech are grounded in English datasets and though one study identified hate speech research done in 21 different languages, opportunities exist for further research\cite{b10} Lastly, exploration of transfer learning techniques using prior knowledge of hate speech datasets may assist in identification and removal of hate speech with minimal resources\cite{b17}.
+
+\section{Project Proposal}
+
+\subsection{Motivation}
+The motivation behind this project is the belief that deep learning models may have the greatest potential to process and detect hate speech in a large sea of content combined with the likely rise in hate speech leading up to the 2024 U.S. presidential election. Moderating online content, while respecting the generally recognized First Amendment right to freedom of speech, is and will continue to be one of the greatest challenges of our generation particularly with the already significant increase in user-generated content (UGC) and artificial intelligence (AI) generated content. 
+
+Our proposed project will attempt to connect data science with social media policy changes, and through this, we may be able to trace the evolution of hate speech on the Reddit platform as it reacted to these changes. This approach could offer new perspectives to researchers related to trends in hate and violent speech. Researchers may want to consider these trends when creating new models or updating existing models used to detect hate speech. There is no doubt this type of modeling along with frequent updates to these models will be an ongoing need as the online social media landscape constantly adapts and evolves. 
+
+\subsection{Dataset}
+Jahan and Oussalah, in 2023, write that "There are no commonly accepted datasets recognized as ideal for automatic HS[Hate Speech] detection tasks\cite{b10}." They also discuss how datasets are dissimilar across research efforts due to the requirements of the project. They note that in 69 datasets there were 47 different labels and that most of the datasets were small and imbalanced\cite{b10}.  
+
+The initial approach to data was to use the Reddit API to create an unlabeled dataset of both comments and submissions and use a pre-trained model(s) to identify hate speech both prior to and after Reddit's 2020 policy change related to hate and inappropriate online speech. 
+
+One method considered is to use a torrent containing a data dump of Reddit comments and submissions. The site (academictorrent.com) offers the data in two formats - \href{https://academictorrents.com/details/9c263fc85366c1ef8f5bb9da0203f4c8c8db75f4}{by year} and \href{https://academictorrents.com/details/56aa49f9653ba545f48df2e33679f014d2829c10}{by subreddit}. The data files are large with the entirety for each site over 2.5 terabytes.  The data are in zstandard compressed ndjson files which are more challenging to work with than a standard json file. Additionally, the uncompressed size of each file could present storage issues given Rivanna upload limits of 10 gigabytes (gb) per file and available local storage space. Most of the more recent files are 20gb or larger (uncompressed). There are available Python scripts to search the compressed files for particular terms but this would defeat the intent of using unlabeled data. 
+
+Another option would be to narrow the window to 2020-2023 and identify or create an algospeak model based on the above discussion of 2016 posts that are still on Reddit and qualify as hate speech. One research team took a novel approach to building training dataset of misogynistic hate speech using the Urban Dictionary\cite{b15} as its pre-trained data and also contributed this dataset to \href{https://www.kaggle.com/datasets/therohk/urban-dictionary-words-dataset/data}{the general public}. The Urban Dictionary could be a source of algospeak definitions as this is a crowd-sourced dictionary.  
+
+At this time, the team is still determining the best approach to the dataset(s) span and format. The team will resolve this issue within the next week after submission of this proposal. 
+
+\subsection{Related Work}
+
+Related work includes various studies that look at aspects of deep learning models. As noted below, one study only found seven papers on the topic of hate speech and deep learning in 2023. This is a difficult field to study given the constantly shifting definitions of hate speech, particularly in the United States where there is no nationally defined governance for online hate speech. Other related work is included below. 
+
+Gambäck and Sikdar\cite{b16} used pre-trained work embeddings, Word2vec by Google and GloVe by Stanford to pre-process text and had success in hate speech detection with CNN models. One study noted that, "from a computer science point of view, the scientific study of hate speech is comparatively a new topic, for which the number of review papers in the field is limited. We found only a few survey or review articles during the process of literature review"\cite{b10}. This study did literature study to review related papers on hate speech and in 2023, found seven\cite{b10}. 
+
+Another study used one of the methods we propose (Reddit API Wrapper - PRAW) to scrape comments related to five posts surrounding policy changes at Reddit in 2015, 2018, and 2020. They wanted to determine if the "attitude towards hate speech moderation" had evolved and "what should and should not be allowed"\cite{b22} Because of the aforementioned constraints with the lack of code provided by academics, we also looked at the internet for potential models and how they performed on specific datasets as references for our own project.  
+
+\subsection{Intended Experiments}
+
+One issue that stymies attempts at consistent modeling with regard to hate speech is the lack of a common definition. Hate speech can be defined, by various entities, as:
+\begin{itemize}
+    \item X[Twitter]: You may not directly attack other people on the basis of race, ethnicity, national origin, caste, sexual orientation, gender, gender identity, religious affiliation, age, disability, or serious disease\cite{b23}.
+    \item YouTube: Hate speech is not allowed on YouTube. We don’t allow content that promotes violence or hatred against individuals or groups based on any of the following attributes, which indicate a protected group status under YouTube’s policy:
+    \begin{itemize}
+        \item Age, Caste, Disability, Ethnicity, Gender Identity and Expression, Nationality, Race, Immigration Status, 
+        \item Religion, Sex/Gender, Sexual Orientation, Victims of a major violent event and their kin, Veteran Status\cite{b24}
+    \end{itemize}
+    \item Meta[Facebook,Threads,Instagram]: We believe that people use their voice and connect more freely when they don’t feel attacked on the basis of who they are. That is why we don’t allow hate speech on Facebook, Instagram, or Threads. It creates an environment of intimidation and exclusion, and in some cases may promote offline violence.
+    \begin{itemize} 
+        \item We define hate speech as direct attacks against people — rather than concepts or institutions— on the basis of what we call protected characteristics (PCs): race, ethnicity, national origin, disability, religious affiliation, caste, sexual orientation, sex, gender identity, and serious disease.
+        \item Additionally, we consider age a protected characteristic when referenced along with another protected characteristic. We also protect refugees, migrants, immigrants, and asylum seekers from the most severe attacks, though we do allow commentary on and criticism of immigration policies.    \item We define a hate speech attack as dehumanizing speech; statements of inferiority, expressions of contempt or disgust; cursing; and calls for exclusion or segregation. We also prohibit the use of harmful stereotypes, which we define as dehumanizing comparisons that have historically been used to attack, intimidate, or exclude specific groups, and that are often linked with offline violence. We also prohibit the usage of slurs that are used to attack people on the basis of their protected characteristics\cite{b25}.
+    \end{itemize}
+        \item British Columbia (B.C.), Canada: Both Canada’s Criminal Code and B.C.’s Human Rights Code describe hate speech as having three main parts:
+        \begin{itemize}
+            \item It is expressed in a public way or place
+            \item It targets a person or group of people with a protected characteristic such as race, religion or sexual orientation
+            \item It uses extreme language to express hatred towards that person or group of people because of their protected characteristic\cite{b26}
+        \end{itemize}  
+\end{itemize}    
+
+Given the various definitions of hate speech, we decided to use a definition by Castaño-Pulgarín, Suárez-Betancur, Vega, and López\cite{b27}: “the use of violent, aggressive or offensive language, focused on a specific group of people who share a common property, which can be religion, race, gender, or sex or political affiliation through the use of Internet and Social Networks”. Our plan is to choose 2-3 pre-trained models and analyze their performance on the two identified datasets preferably looking at Reddit submissions and comments prior to 2020 and those after the policy change in June 2020.
+
+Our goal is to test models with different architectures, such as BERT or CNN, and attempt to find models pre-trained on data before and after 2020. Ultimately, we plan to measure different models’ performance before and after the policy change because we believe that hate speech may have adapted to avoid new policies. As a result, models created and trained prior to 2020 may not pick up on hate speech as effectively when used on post-2020 data. 
+
+\begin{thebibliography}{00}
+
+\bibitem{b1}"The Musk bump: quantifying the rise in hate speech under Elon Musk." Center for Countering Digital Hate. \href{https://counterhate.com/blog/the-musk-bump-quantifying-the-rise-in-hate-speech-under-elon-musk}{https://counterhate.com/blog/the-musk-bump-quantifying-the-rise-in-hate-speech-under-elon-musk/} (accessed March 7, 2024).
+\bibitem{b2}G. Schmid, P. Koehler, and N. Koch. "Digital Services Act (DSA). What digital intermediaries need to know", TaylorWessing Webinar, February 20, 2024.\href{https://www.taylorwessing.com/en/insights-and-events/insights/2024/02/dsa-webinar}{https://www.taylorwessing.com/en/insights-and-events/insights/2024/02/dsa-webinar} (accessed March 8, 2024).
+\bibitem{b3}F. Nascimento, G. Cavalcanti, and M. Da Costa-Abrue. “Exploring automatic hate speech detection on social media: a focus on content-based analysis.", vol 13, iss 2, 2023. \href{https://doi.org/10.1177/21582440231181311}{https://doi.org/10.1177/21582440231181311} (accessed March 8, 2024).
+\bibitem{b4}D. Lee. “Twitter's hate speech rules are expanded.” BBC. \href{https://www.bbc.com/news/technology-42376546}{https://www.bbc.com/news/technology-42376546} (accessed March 7, 2024).
+\bibitem{b5} “Reddit content policy.” Reddit. \href{https://www.redditinc.com/policies/content-policy}{https://www.redditinc.com/policies/content-policy} (accessed March 5, 2024).
+\bibitem{b6}E. Steen, K. Yurechko, and D. Klug. "You can (not) say what you want: using algospeak to contest and evade algorithmic content moderation on TikTok. Social Media + Society, vol 9, iss 3, 2023. \href{https://doi.org/10.1177/20563051231194586}{https://doi.org/10.1177/20563051231194586} (accessed March7, 2024).
+\bibitem{b7}A. Greenberg. "Inside Google’s internet justice league and its AI-powered war on trolls.", Wired, September 19, 2016. https://www.wired.com/2016/09/inside-googles-internet-justice-league-ai-powered-war-trolls/ (accessed March 8, 2024).
+\bibitem{b8} Lycanroc. "Operation Google.", 2016. \href{https://knowyourmeme.com/memes/events/operation-google}{https://knowyourmeme.com/memes/events/operation-google} (accessed March 8, 2024).
+\bibitem{b9} aviewfromoutside. "4chan and /pol/ are launching "Operation Google.", 2016. \href{https://www.reddit.com/r/technology/comments/543a1q/}{https://www.reddit.com/r/technology/comments/543a1q/} (accessed March 8, 2024).
+\bibitem{b10}M. Jahan and M. Oussalah. "A systematic review of hate speech automatic detection using natural language processing." in Neurocomputing, vol 546, 2023. \href{https://doi.org/10.1016/j.neucom.2023.126232}{https://doi.org/10.1016/j.neucom.2023.126232} (accessed March 7, 2024).
+\bibitem{b11}H. Chen, S. McKeever, and S.J. Delany. "A comparison of classical versus deep learning techniques for abusive content detection on social media sites." In: S. Staab, O. Koltsova, and D. Ignatov (eds) Social Informatics. SocInfo 2018. Lecture Notes in Computer Science(), vol 11185. \href{https://link.springer.com/book/10.1007/978-3-030-01129-1}{https://link.springer.com/book/10.1007/978-3-030-01129-1} (accessed March 7, 2024).
+\bibitem{b12}A. Marshan, F.N.M Nizar, A. Ioannou, and K. Spanaki. "Comparing machine learning and deep learning techniques for text analytics: detecting the severity of hate comments online." Information System Frontiers. 2023. \href{https://doi.org/10.1007/s10796-023-10446-x}{https://doi.org/10.1007/s10796-023-10446-x} (accessed March 7, 2024).
+\bibitem{b13}A. Siagh, F.Z Laallam, O. Kazar, H. Salem, and M.E. Benglia. "IDA: an imbalanced data augmentation for text classification. [Intelligent Systems and Pattern Recognition]. Communications in Computer and Information Science, vol 1940, 2023. \href{https://doi.org/10.1007/978-3-031-46335-8_19}{https://doi.org/10.1007/978-3-031-46335-8{\_}19} (accessed March 8, 2024).
+\bibitem{b14} Anonymous. DS5001 University of Virginia Spring 2024 Course Notes. 
+\bibitem{b15}T. Lynn, P. T. Endo, P. Rosati, I. Silva, G. L. Santos, and D. Ging, "A comparison of machine learning approaches for detecting misogynistic speech in urban dictionary." 2019 International Conference on Cyber Situational Awareness, Data Analytics And Assessment, pp. 1-8, 2019. \href{https://doi.org/10.1109/CyberSA.2019.8899669}{https://doi.org/10.1109/CyberSA.2019.8899669} (accessed March 7, 2024).
+\bibitem{b16}B. Gambäck, U.K. Sikdar. "Using convolutional neural networks to classify hate-speech.", Association for Computational Linguistic, pp. 85-90, 2017. \href{https://doi.org/10.18653/v1/w17-3013} 
+{https://doi.org/10.18653/v1/w17-3013} (accessed March 2, 2024).
+\bibitem{b17}M. Subramanian, V.E. Sathiskumar, G. Deepalakshmi, J. Cho, and G. Manikandan. "A survey on hate speech detection and sentiment analysis using machine learning and deep learning models." Alexandria Engineering Journal, vol 80, pp.110-121, 2023. \href{https://doi.org/10.1016/j.aej.2023.08.038}{https://doi.org/10.1016/j.aej.2023.08.038} (accessed March 7, 2024).
+\bibitem{b18} V. Mathur. "BERT And its model variants.", May 11, 2023. \href{https://medium.com/aimonks/bert-and-its-model-variants-162bb292611c}{https://medium.com/aimonks/bert-and-its-model-variants-162bb292611c} (accessed March 8, 2024).
+\bibitem{b19}S. Zimmerman, U. Kruschwitz, and C. Fox. "Improving hate speech detection with deep learning ensembles." In: N.Calzolari et al. [\textit{Proceedings of the Eleventh International Conference on Language Resources}], May 2018. \href{https://aclanthology.org/L18-1404/}{https://aclanthology.org/L18-1404/} (accessed March 7, 2024).
+\bibitem{b20}M.A. Bashar and R. Nyak. "CNN for hate speech and offensive content identification in Hindi language." CEUR Workshop Proceedings. Working Notes of FIRE 2019 - Forum for Information Retrieval Evaluation, volume 2517, pp. 237-245, August 2020. \href{https://arxiv.org/abs/2008.12448}{https://arxiv.org/abs/2008.12448} (accessed March 7, 2024).
+\bibitem{b21}P. Badjatiya, S. Gupta, M. Gupta, and V. Varma. "Deep learning for hate speech detection in Tweets." [\textit{WWW'17 Companion: Proceedings of the 26th International Conference on the World Wide Web Companion}]. pp.759-760, April 2017. \href{https://doi.org/10.1145/3041021.3054223}{https://doi.org/10.1145/3041021.3054223} (accessed March 7, 2024).
+\bibitem{b22} E.Nakajima Wickham and E. Öhman. "Hate speech, censorship, and freedom of speech: the changing policies of Reddit.", Journal of Data Mining {\&} Digital Humanities, May 30, 2022, \href{https://doi.org/10.46298/jdmdh}{https://doi.org/10.46298/jdmdh} (accessed March 9, 2024).
+\bibitem{b23}"Hateful conduct.", X[Twitter], April 2023. \href{https://help.twitter.com/en/rules-and-policies/hateful-conduct-policy}{https://help.twitter.com/en/rules-and-policies/hateful-conduct-policy} (accessed March 8, 2024).
+\bibitem{b24}"Hate speech policy.", YouTube, June 2019. \href{https://support.google.com/youtube/answer/2801939?hl=en}{https://support.google.com/youtube/answer/2801939?hl=en} (accessed March 8, 2024).
+\bibitem{b25}"Hate speech.", Meta, March 1, 2024. \href{https://transparency.fb.com/policies/community-standards/hate-speech/}{https://transparency.fb.com/policies/community-standards/hate-speech/} (accessed March 8, 2024).
+\bibitem{b26} "Hate speech q{\&}a", British Columbia's Office of Human Rights Commissioner. \href{https://bchumanrights.ca/hate-speech-qa/}{https://bchumanrights.ca/hate-speech-qa/} (accessed March 9, 2024).
+\bibitem{b27}S.A. Castaño-Pulgarín, N. Suárez-Betancur, L. Magnolia Tilano Vega and H. Mauricio Herrara López."Internet, social media and online hate speech. Systematic review." Aggression and Violent Behavior, vol 58, May-June 2021. \href{https://doi.org/10.1016/j.avb.2021.101608}{https://doi.org/10.1016/j.avb.2021.101608} (accessed March 7, 2024).
+\end{thebibliography}
+\end{document}
