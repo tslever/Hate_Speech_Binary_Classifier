@@ -1,0 +1,53 @@
+Bar Chart
+
+On the left is a bar chart of numbers of predictions of hate speech on a sample of 1000 testing observations.
+A version of TinyBERT that was trained on HateSpeechDataset*Balanced* predicted that many texts were hate speech.
+I, and BERT and TinyBERT trained on HateSpeechDataset, predicted that similar numbers of texts were hate speech.
+A version of DistilBERT that was trained on ETHOS, Lorinda, and Hannah predicted that similar numbers of texts were hate speech.
+
+
+Agreements Matrix
+
+On the right is an agreements matrix.
+
+TinyBERT agreed most with BERT and less with DistilBERT. TinyBERT agreed most with Tom.
+BERT agreed most with TinyBERT and less with DistilBERT. BERT agreed most with Tom.
+DistilBERT agreed most with TinyBERT and less with BERT. DistilBERT agreed most with Tom and Lorinda.
+
+To introduce a little levity, perhaps Tom thinks most like a computer.
+To go a little deeper with that thought, maybe BERT was designed to think like Google engineers.
+
+
+Network Diagram
+
+Here are network diagrams.
+Lorinda and Tom's ground-truth labeling of test data was most similar.
+Hannah's labeling was pretty similar to Lorinda and Tom's labeling.
+ETHOS / DistilBERT labeling was fairly similar to human labeling, following by HateSpeechDataset / BERT, followed by TinyBERT.
+
+
+Conclusions
+
+I recommend the following.
+
+Be careful with resources
+- Human resources: I'm about to go on a company retreat. I recommend building trust throughout projects​ and being intentional about communication.
+- I work as a software developer and am learning GIS. I recommend distributing work according to skills, then interests​.
+- Management resources: Come up with a Software Development Plan, a System Development Plan, a Deployment Plan, and a Kanban board.
+- Development resources: Come up with a System Description, a System Diagram, Use-Case Descriptions, user stories, an Interface Design, and prototypes.
+- Operating system resources: Minimize number of checkpoints and libraries​.
+- Application resources: Use Git.
+- Transition away from Jupyter notebooks​.
+- Use PyTorch instead of TensorFlow​.
+- Use GPU's​.
+- Use multiple Virtual Machines.
+
+Improve performance
+- Modify architecture or tune​
+- Maybe train, validate, and test on larger texts​
+- Maybe Use an ensemble
+
+We did not discover a clear impact of policy change on hate speech.
+Hate speech can be difficult to identify.
+Our models were able to identify clear cut hate speech.
+We shared a paper and code​ with the public.
